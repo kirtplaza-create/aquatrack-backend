@@ -20,6 +20,7 @@ Route::post('/login', function (Request $request) {
         return response()->json(['message' => 'Invalid credentials'], 401);
     }
 
+    // simple random token, stored on frontend (not Sanctum)
     $token = bin2hex(random_bytes(40));
 
     return response()->json([
@@ -30,6 +31,21 @@ Route::post('/login', function (Request $request) {
 
 // Protected routes
 Route::middleware('simple.token')->group(function () {
+    // Extra protection: confirm admin password before dangerous actions like delete
+    Route::post('/admin/confirm-password', function (Request $request) {
+        $request->validate([
+            'password' => ['required', 'string'],
+        ]);
+
+        $validPass = env('APP_LOGIN_PASSWORD', '1234');
+
+        if ($request->password !== $validPass) {
+            return response()->json(['message' => 'Invalid admin password'], 403);
+        }
+
+        return response()->json(['ok' => true]);
+    });
+
     Route::apiResource('sales', SaleController::class);
     Route::apiResource('refills', RefillController::class);
     Route::apiResource('transactions', TransactionController::class);
