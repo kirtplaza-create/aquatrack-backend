@@ -49,4 +49,5 @@ Route::middleware('simple.token')->group(function () {
     Route::apiResource('sales', SaleController::class);
     Route::apiResource('refills', RefillController::class);
     Route::apiResource('transactions', TransactionController::class);
+    Route::get('/sales/stats', [SaleController::class, 'stats']);
 });
