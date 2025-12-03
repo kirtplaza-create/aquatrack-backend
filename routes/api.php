@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SaleController;
 
+
 // Login (fixed admin account from .env)
 Route::post('/login', function (Request $request) {
     $data = $request->validate([
@@ -46,6 +47,9 @@ Route::middleware('simple.token')->group(function () {
 
     // IMPORTANT: stats before apiResource so it is not treated as {sale}
     Route::get('/sales/stats', [SaleController::class, 'stats']);
-
+    Route::get('/sales/year-stats', [SaleController::class, 'yearStats']);
+    Route::get('/sales/today', [SaleController::class, 'today']);
     Route::apiResource('sales', SaleController::class);
+    Route::get('/debug-now', fn () => now()->toDateTimeString());
+
 });

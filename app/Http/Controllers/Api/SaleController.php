@@ -18,6 +18,21 @@ class SaleController extends Controller
         return Sale::orderBy('created_at', 'desc')->get();
     }
 
+    public function today()
+{
+    $today = Carbon::today(config('app.timezone'));
+
+    $todayTotal = Sale::whereDate('created_at', $today)
+        ->where('status', 'Done')
+        ->sum('total_amount');
+
+    return response()->json([
+        'today_total' => $todayTotal,
+    ]);
+}
+
+
+
     /**
      * Store a newly created sale.
      */
@@ -141,4 +156,21 @@ class SaleController extends Controller
             'points'                 => $filled,
         ]);
     }
+
+    public function yearStats(Request $request)
+{
+    $year = (int) $request->query('year', now()->year);
+
+    // Sum Done sales per day for the whole year
+    $daily = DB::table('sales')
+        ->selectRaw('DATE(created_at) as date, SUM(total_amount) as amount')
+        ->whereYear('created_at', $year)
+        ->where('status', 'Done')
+        ->groupBy('date')
+        ->orderBy('date')
+        ->get();
+
+    return response()->json($daily);
+}
+
 }
