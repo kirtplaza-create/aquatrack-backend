@@ -3,8 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SaleController;
-use App\Http\Controllers\Api\RefillController;
-use App\Http\Controllers\Api\TransactionController;
 
 // Login (fixed admin account from .env)
 Route::post('/login', function (Request $request) {
@@ -46,8 +44,8 @@ Route::middleware('simple.token')->group(function () {
         return response()->json(['ok' => true]);
     });
 
-    Route::apiResource('sales', SaleController::class);
-    Route::apiResource('refills', RefillController::class);
-    Route::apiResource('transactions', TransactionController::class);
+    // IMPORTANT: stats before apiResource so it is not treated as {sale}
     Route::get('/sales/stats', [SaleController::class, 'stats']);
+
+    Route::apiResource('sales', SaleController::class);
 });

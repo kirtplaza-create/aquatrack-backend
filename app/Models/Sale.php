@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model
 {
+    use HasFactory;
+
+    protected $table = 'sales';
+
     protected $fillable = [
-        'name',              // customer name column in your sales table
+        'name',
         'purpose',
         'gallons',
         'price_per_gallon',
