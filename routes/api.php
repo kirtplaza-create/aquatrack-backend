@@ -2,20 +2,23 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Api\SaleController;
+use App\Http\Controllers\Api\AccountController;
+use App\Http\Controllers\Api\SettingsController;
+use App\Models\User;
 
-
-// Login (fixed admin account from .env)
+// Login (uses users table now)
 Route::post('/login', function (Request $request) {
     $data = $request->validate([
         'name'     => ['required', 'string'],
         'password' => ['required', 'string'],
     ]);
 
-    $validName = env('APP_LOGIN_NAME', 'admin');
-    $validPass = env('APP_LOGIN_PASSWORD', '1234');
+    // for now assume single admin row
+    $user = User::first();
 
-    if ($data['name'] !== $validName || $data['password'] !== $validPass) {
+    if (! $user || $data['name'] !== $user->name || ! Hash::check($data['password'], $user->password)) {
         return response()->json(['message' => 'Invalid credentials'], 401);
     }
 
@@ -23,7 +26,7 @@ Route::post('/login', function (Request $request) {
     $token = bin2hex(random_bytes(40));
 
     return response()->json([
-        'user'  => ['name' => $validName],
+        'user'  => ['name' => $user->name],
         'token' => $token,
     ]);
 });
@@ -36,20 +39,30 @@ Route::middleware('simple.token')->group(function () {
             'password' => ['required', 'string'],
         ]);
 
-        $validPass = env('APP_LOGIN_PASSWORD', '1234');
+        $user = User::first();
 
-        if ($request->password !== $validPass) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid admin password'], 403);
         }
 
         return response()->json(['ok' => true]);
     });
 
-    // IMPORTANT: stats before apiResource so it is not treated as {sale}
+    // Account info
+    Route::get('/account', [AccountController::class, 'show']);
+    Route::put('/account', [AccountController::class, 'update']);
+
+    // Sales routes
     Route::get('/sales/stats', [SaleController::class, 'stats']);
     Route::get('/sales/year-stats', [SaleController::class, 'yearStats']);
     Route::get('/sales/today', [SaleController::class, 'today']);
     Route::apiResource('sales', SaleController::class);
     Route::get('/debug-now', fn () => now()->toDateTimeString());
 
+    // Settings routes
+    Route::get('/settings/prices', [SettingsController::class, 'prices']);
+    Route::put('/settings/prices', [SettingsController::class, 'updatePrices']);
+
+    // Dangerous system reset
+    Route::post('/settings/reset-system', [SettingsController::class, 'resetSystem']);
 });
