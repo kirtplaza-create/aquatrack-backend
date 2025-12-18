@@ -9,7 +9,7 @@ use App\Models\User;
 
 class AccountController extends Controller
 {
-    public function show(Request $request)
+    public function show(Request $request) // GET /api/account
     {
         // single admin user for now
         $user = User::first();
@@ -22,7 +22,7 @@ class AccountController extends Controller
         ]);
     }
 
-   public function update(Request $request)
+   public function update(Request $request) // PUT /api/account
     {
         $data = $request->validate([
             'name'            => 'required|string|max:255',
@@ -40,7 +40,7 @@ class AccountController extends Controller
     ]);
 
 
-        $user = User::first() ?? new User();
+        $user = User::first() ?? new User();// single admin user
 
         $user->name    = $data['name'];
         $user->phone   = $data['phone'] ?? null;
@@ -56,7 +56,7 @@ class AccountController extends Controller
             $user->password = Hash::make($data['newPassword']);
         }
 
-        $user->save();
+        $user->save(); // save or update
 
         return response()->json([
             'name'    => $user->name,

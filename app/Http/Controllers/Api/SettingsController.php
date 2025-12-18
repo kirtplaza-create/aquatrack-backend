@@ -11,18 +11,18 @@ use App\Models\Sale; // if your sales model is named Sale
 
 class SettingsController extends Controller
 {
-    public function prices()
+    public function prices() // GET /api/settings/prices
     {
-        $regular = DB::table('settings')->where('key', 'price_regular')->value('value') ?? 15;
-        $small   = DB::table('settings')->where('key', 'price_small')->value('value') ?? 10;
+        $regular = DB::table('settings')->where('key', 'price_regular')->value('value') ?? 15; // default 15
+        $small   = DB::table('settings')->where('key', 'price_small')->value('value') ?? 10; // default 10
 
-        return response()->json([
-            'price_regular' => (float) $regular,
-            'price_small'   => (float) $small,
+        return response()->json([ // return current prices
+            'price_regular' => (float) $regular, // cast to float
+            'price_small'   => (float) $small, // cast to float
         ]);
     }
 
-    public function updatePrices(Request $request)
+    public function updatePrices(Request $request) // PUT /api/settings/prices
     {
         $data = $request->validate([
             'price_regular' => 'required|numeric|min:0',

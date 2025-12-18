@@ -13,16 +13,16 @@ class SaleController extends Controller
     /**
      * Display a listing of the sales.
      */
-    public function index()
+    public function index() // GET /api/sales
     {
-        return Sale::orderBy('created_at', 'desc')->get();
+        return Sale::orderBy('created_at', 'desc')->get(); // latest first
     }
 
-    public function today()
+    public function today() // GET /api/sales/today
 {
-    $today = Carbon::today(config('app.timezone'));
+    $today = Carbon::today(config('app.timezone')); // get today in app timezone
 
-    $todayTotal = Sale::whereDate('created_at', $today)
+    $todayTotal = Sale::whereDate('created_at', $today) // filter by date only
         ->where('status', 'Done')
         ->sum('total_amount');
 
@@ -36,7 +36,7 @@ class SaleController extends Controller
     /**
      * Store a newly created sale.
      */
-    public function store(Request $request)
+    public function store(Request $request) // POST /api/sales
     {
         $data = $request->validate([
             'name'              => ['required', 'string', 'max:255'],
@@ -55,7 +55,7 @@ class SaleController extends Controller
     /**
      * Display a specific sale.
      */
-    public function show(Sale $sale)
+    public function show(Sale $sale) // GET /api/sales/{sale}
     {
         return $sale;
     }
@@ -63,7 +63,7 @@ class SaleController extends Controller
     /**
      * Update the specified sale.
      */
-    public function update(Request $request, Sale $sale)
+    public function update(Request $request, Sale $sale) // PUT /api/sales/{sale}
     {
         $data = $request->validate([
             'name'              => ['sometimes', 'required', 'string', 'max:255'],
@@ -82,7 +82,7 @@ class SaleController extends Controller
     /**
      * Remove the specified sale.
      */
-    public function destroy(Sale $sale)
+    public function destroy(Sale $sale) // DELETE /api/sales/{sale}
     {
         $sale->delete();
 
@@ -95,12 +95,12 @@ class SaleController extends Controller
      * GET /api/sales/stats?from=YYYY-MM-DD&to=YYYY-MM-DD
      * If from/to not provided, uses current month.
      */
-    public function stats(Request $request)
+    public function stats(Request $request) // GET /api/sales/stats
     {
         $from = $request->query('from');
         $to   = $request->query('to');
 
-        if (!$from || !$to) {
+        if (!$from || !$to) { // default to current month
             $start = Carbon::now()->startOfMonth();
             $end   = Carbon::now()->endOfMonth();
         } else {
@@ -170,7 +170,7 @@ class SaleController extends Controller
         ->orderBy('date')
         ->get();
 
-    return response()->json($daily);
+    return response()->json($daily); // returns array of {date, amount}
 }
 
 }

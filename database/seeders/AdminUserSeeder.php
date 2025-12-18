@@ -10,7 +10,7 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::updateOrCreate(
+        User::updateOrCreate( // create or update admin user
             ['name' => 'admin'],   // this will be the username
             [
                 'email' => 'owner@example.com', // optional, for contact only

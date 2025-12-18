@@ -11,7 +11,7 @@ return new class extends Migration
      */
    public function up(): void
 {
-    Schema::table('users', function (Blueprint $table) {
+    Schema::table('users', function (Blueprint $table) { // add new columns
         $table->string('phone')->nullable()->after('email');
         $table->string('address')->nullable()->after('phone');
     });
